@@ -1,0 +1,26 @@
+{
+  "name": "file-api",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/file-api/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "file-api:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "file-api:build:development"
+        },
+        "production": {
+          "buildTarget": "file-api:build:production"
+        }
+      }
+    }
+  }
+}
