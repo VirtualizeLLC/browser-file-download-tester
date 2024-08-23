@@ -27,8 +27,8 @@ app.get('/assets/base64/:name', async (req, res) => {
   const filePath = path.resolve(__dirname, './assets', name)
 
   try {
-    const base64Read = await readFile(filePath, { encoding: 'base64url' })
-    return res.send(base64Read)
+    const base64Read = await readFile(filePath, { encoding: 'base64' })
+    return res.send(encodeURI(base64Read))
   } catch (e) {
     console.error('base64 read failure: ', e)
     res.sendStatus(500)
