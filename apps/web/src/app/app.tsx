@@ -384,7 +384,6 @@ export function App() {
         <span>Base64 Preview Image</span>
         <img
           className='max-w-sm	max-h-sm w-6/12'
-          // src={`data:image/png;base64, ${base64Preview}`}
           src={`data:image/png;base64, ${base64Preview}`}
           alt='Generated base 64'
         />

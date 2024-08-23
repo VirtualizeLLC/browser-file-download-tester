@@ -15,17 +15,46 @@
 - Requires node 22
 - To save time, I recommend globally aliasing the `nx` command to `npx nx` or global installed `npm i -g nx`.
 
+## Features
+
+1. Determine if a browser download of an asset works on your platform. Meant for native mobile, desktop, server download testing.
+2. Determine if a browser asset can render if given base64 or a blob file.
+
+### Covers the following cases
+
+- Assets can be downloaded via previews
+- Base64 assets
+- Blob assets (from local browser that need to be downloaded on the client)
+- anchor tags with download attribute and a url asset
+
+### UI
+
+The WebUI allows the user to click a specific file type. Currently only `.png` and `.webp` have actual assets that will load actual data.
+
+Other file types can be generated via the command `npm run generate-assets` which will add more assets, all at 1 MegaByte in size.
+
+This can be configured if you want within the [make-files.sh](scripts/make-files.sh) script example if you want to test downloading a 500MB files. You could swap the file size to `FILE_SIZE="500mb"` which would make files take a long time to download and likely would not work well with base64 from the server since it sends the entire string.
+
+#### Example UI
+
+The second image shows a preview of the downloaded file. This could be any file you place within assets if you need to test a specific file.
+
+<img alt="Tester UI with no preview" src="./docs/images/browser-link-tester-preview.png" width="20%" style="max-height:400px" />
+<img alt="Tester UI with preview" src="./docs/images/browser-link-tester-with-image-resolved.png" width="20%" style="max-height:400px" />
+<img alt="Tester UI with preview" src="./docs/images/browser-link-tester-large.png" maxWidth="40%" style="max-height:400px" />
+
 ## Quick Start
 
 Quick start to launch all projects both web and server.
 
 ```sh
 npm install
+npm run generate-assets
 nx run-many -t serve
 ```
 
-- Web: http://localhost:4200
-- Server http://localhost:3333
+- Web: <http://localhost:4200>
+- Server <http://localhost:3333>
 
 For android make sure to rebind ports.
 
