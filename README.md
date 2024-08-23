@@ -39,9 +39,9 @@ This can be configured if you want within the [make-files.sh](scripts/make-files
 
 The second image shows a preview of the downloaded file. This could be any file you place within assets if you need to test a specific file.
 
-<img alt="Tester UI with no preview" src="./docs/images/browser-link-tester-preview.png" width="20%" style="max-height:400px" />
-<img alt="Tester UI with preview" src="./docs/images/browser-link-tester-with-image-resolved.png" width="20%" style="max-height:400px" />
-<img alt="Tester UI with preview" src="./docs/images/browser-link-tester-large.png" maxWidth="40%" style="max-height:400px" />
+<img alt="Tester UI with no preview" src="./docs/images/browser-link-tester-preview.png" style="max-height:300px;max-width:20%;" />
+<img alt="Tester UI with preview" src="./docs/images/browser-link-tester-with-image-resolved.png" style="max-height:300px;max-width:20%;" />
+<img alt="Tester UI with preview" src="./docs/images/browser-link-tester-large.png" style="max-height:300px;max-width:40%;" />
 
 ## Quick Start
 
