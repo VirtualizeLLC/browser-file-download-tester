@@ -1,4 +1,4 @@
-import { MouseEventHandler } from 'react'
+import { FC, MouseEventHandler, useState } from 'react'
 
 const fileApiBaseUrl = 'http://127.0.0.1:3333'
 
@@ -146,7 +146,11 @@ const handleBase64Click =
     }
   }
 
-const generateFileGetters = (fileName: string, extensionTypes: string[]) => {
+const FileGetters: FC<{
+  hasRedirect: boolean
+  extensionTypes: string[]
+  fileName: string
+}> = ({ hasRedirect, extensionTypes, fileName }) => {
   return extensionTypes.map((extensionType: string) => {
     const anchorLink = getServerFileUrl({
       fetchType: 'blob',
@@ -194,11 +198,37 @@ const generateFileGetters = (fileName: string, extensionTypes: string[]) => {
 const roadSignAsset = 'roadsign-test'
 
 export function App() {
+  const [hasRedirect, setRedirect] = useState(false)
+  const toggleRedirect = () => setRedirect((val) => !val)
+
+  const redirectStateText = hasRedirect ? 'enabled' : 'disabled'
+  const redirectLabelText = `Redirect ${redirectStateText}`
   return (
     <div>
-      <h1>Browser Link Tester"</h1>
-      {generateFileGetters(roadSignAsset, ['png', 'webp'])}
-      {generateFileGetters(generatedAsset, baseExtensionTypes)}
+      <h1 className='text-2xl font-bold'>Browser Link Tester</h1>
+      <div className='py-2 bg-slate-100'>
+        <div className='text-xl '>Settings</div>
+        <div className='p-2'>
+          <span>Redirect</span>
+          <button
+            className={`bg-yellow-400 ${baseButtonStyle}`}
+            aria-label={redirectLabelText}
+            onClick={toggleRedirect}
+          >
+            {redirectStateText}
+          </button>
+        </div>
+      </div>
+      <FileGetters
+        hasRedirect={hasRedirect}
+        fileName={roadSignAsset}
+        extensionTypes={['png', 'webp']}
+      />
+      <FileGetters
+        hasRedirect={hasRedirect}
+        fileName={generatedAsset}
+        extensionTypes={baseExtensionTypes}
+      />
     </div>
   )
 }
