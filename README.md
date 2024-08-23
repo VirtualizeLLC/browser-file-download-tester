@@ -10,6 +10,32 @@
 
 [Click here to finish setting up your workspace!](https://cloud.nx.app/connect/Vx4mJkaNNu) -->
 
+## Installation
+
+- Requires node 22
+- To save time, I recommend globally aliasing the `nx` command to `npx nx` or global installed `npm i -g nx`.
+
+## Quick Start
+
+Quick start to launch all projects both web and server.
+
+```sh
+npm install
+nx run-many -t serve
+```
+
+- Web: http://localhost:4200
+- Server http://localhost:3333
+
+For android make sure to rebind ports.
+
+```sh
+adb reverse tcp:4200 tcp:4200
+adb reverse tcp:3333 tcp:3333
+```
+
+Extensive rebind script for android (for multi-device runs too) see [modular-platform-config](https://github.com/FrederickEngelhardt/modular-platform-config/blob/main/src/zsh/plugins/android/android-adb.zsh)
+
 ## Run tasks
 
 To run tasks with Nx use:
