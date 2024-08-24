@@ -192,7 +192,7 @@ export const FileGetters: FC<FileGettersProps> = ({
   hasDownload,
 }) => {
   return (
-    <div className='flex flex-wrap gap-2'>
+    <div className='flex my-2 flex-wrap gap-2 sm:justify-normal'>
       {extensionTypes.map((extensionType: string) => {
         const anchorLink = getServerFileUrl({
           fetchType: 'blob',
@@ -200,14 +200,11 @@ export const FileGetters: FC<FileGettersProps> = ({
           extensionType,
         })
         return (
-          <div
-            key={extensionType}
-            className='flex flex-wrap text-xs bg-gray-700 rounded p-2 lg:w-1/3 my-2'
-          >
-            <h2 className='underline'>
-              {fileName}.{extensionType}
-            </h2>
-            <div className='flex flex-wrap'>
+          <div key={extensionType} className='flex flex-wrap text-xs'>
+            <div className='flex flex-col bg-gray-700 p-4 rounded flex-wrap'>
+              <h2 className='underline py-2'>
+                {fileName}.{extensionType}
+              </h2>
               <span className={`${baseButtonStyle} bg-blue-500`}>
                 <a href={anchorLink}>
                   <span>anchor link</span>

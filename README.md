@@ -49,9 +49,12 @@ The second image shows a preview of the downloaded file. This could be any file 
 
 Quick start to launch all projects both web and server.
 
+You will need to enable [corepack](https://nodejs.org/api/corepack.html)
+`corepack use yarn@4.4.0`
+
 ```sh
-npm install
-npm run generate-assets
+yarn
+yarn run generate-assets
 nx run-many -t serve
 ```
 

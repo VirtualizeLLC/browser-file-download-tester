@@ -5,7 +5,7 @@ import {
   PersistOptions,
   PersistStorage,
 } from 'zustand/middleware'
-import { OptionProps } from 'react-select'
+import { OnChangeValue, OptionProps } from 'react-select'
 
 import { SelectorProps } from './../components/Selector'
 import {
@@ -18,7 +18,7 @@ interface SelectedExtensionsStore {
   selectedExtensions: string[]
   selectedExtensionsSet: Set<string>
   isSelected: SelectorProps['isSelected']
-  update: SelectorProps['onChange']
+  update: (newValue: { value: string; label: string }[]) => void
   clear: () => void
 }
 

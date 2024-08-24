@@ -9,9 +9,15 @@ export const ExtensionSelector: FC = () => {
     <div>
       <Selector
         placeholder={'Select Extensions to Test'}
-        onChange={update}
+        onChange={(newValue) => {
+          /* eslint-disable @typescript-eslint/ban-ts-comment */
+          // @ts-ignore
+          update(newValue)
+        }}
         isSelected={isSelected}
+        // @ts-ignore
         selectedOptions={generationOptionsFromListOfValues(selectedExtensions)}
+        // @ts-ignore
         availableOptions={generationOptionsFromListOfValues(
           availableExtensions
         )}

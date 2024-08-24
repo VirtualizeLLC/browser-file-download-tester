@@ -8,9 +8,12 @@ import Select, {
 import invertColor from 'invert-color'
 import { matchColorToSelector } from '../helpers/alphaNumericColorMatcher'
 
-const generateOptionFromValue = (val: string) => ({ value: val, label: val })
-export const generationOptionsFromListOfValues = (vals: string[]) =>
-  vals.map(generateOptionFromValue)
+const generateOptionFromValue = (
+  val: string
+): { value: string; label: string } => ({ value: val, label: val })
+export const generationOptionsFromListOfValues = (
+  vals: string[]
+): { value: string; label: string }[] => vals.map(generateOptionFromValue)
 
 export interface SelectorProps {
   isSelected(option: OptionProps): boolean
@@ -38,6 +41,10 @@ export const Selector: FC<SelectorProps> = ({
           return { ...base, color: undefined }
         },
         multiValueRemove(base, props) {
+          return {}
+        },
+
+        input() {
           return {}
         },
 
@@ -106,20 +113,28 @@ export const Selector: FC<SelectorProps> = ({
       classNames={{
         placeholder: () => 'gray-100',
         container: () => 'flex w-100',
-        multiValueRemove: () => 'max-h-10',
+        multiValueRemove: () => '',
         multiValueLabel: () => 'font-bold',
         clearIndicator: () => 'bg-gray-700',
         dropdownIndicator: () => 'fill-white	',
-        indicatorsContainer: () => 'flex justify-between bg-gray-700 max-h-10',
-        valueContainer: () => 'bg-gray-400 lg:p2',
-        option: (state) => (state.isFocused ? 'bg-gray-800' : ''),
+        indicatorsContainer: () => 'flex justify-between bg-gray-700',
+        valueContainer: (props) => {
+          const classes: string[] = [
+            'bg-gray-400 lg:p2 border-2 border-gray-700',
+          ]
+          return classes.join(' ')
+        },
+        option: (props) => (props.isFocused ? 'bg-gray-800' : ''),
         control(props) {
-          const classes = ['bg-gray-800', 'flex-col  sm:flex-row', 'border-2']
+          const classes: string[] = [
+            // 'bg-gray-800',
+            'flex-col  sm:flex-row my-5 border-2',
+          ]
 
           if (props.isFocused) {
-            classes.push('border-gray-800')
+            classes.push('border-blue-600')
           } else {
-            classes.push('border-gray-600')
+            classes.push('border-gray-700')
           }
 
           return classes.join(' ')
