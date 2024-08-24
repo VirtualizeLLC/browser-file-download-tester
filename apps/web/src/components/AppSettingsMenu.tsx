@@ -39,7 +39,7 @@ export const AppSettingsMenu: FC = () => {
                 color: invertColor(matchedBgColor, true),
               }}
               className={`${
-                valueText === 'enabled' ? 'line-through' : ''
+                valueText !== 'enabled' ? 'line-through' : ''
               } text-xs ${baseButtonStyle}`}
               aria-label={`${labelText} ${valueText}`}
               onClick={(e) => onClick()}

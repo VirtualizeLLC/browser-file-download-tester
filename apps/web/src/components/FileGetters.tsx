@@ -202,12 +202,12 @@ export const FileGetters: FC<FileGettersProps> = ({
         return (
           <div
             key={extensionType}
-            className='flex flex-column flex-wrap text-xs bg-gray-700 rounded p-2 my-2'
+            className='flex flex-wrap text-xs bg-gray-700 rounded p-2 lg:w-1/3 my-2'
           >
             <h2 className='underline'>
               {fileName}.{extensionType}
             </h2>
-            <div className='flex flex-col flex-wrap'>
+            <div className='flex flex-wrap'>
               <span className={`${baseButtonStyle} bg-blue-500`}>
                 <a href={anchorLink}>
                   <span>anchor link</span>

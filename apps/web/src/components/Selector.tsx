@@ -34,21 +34,23 @@ export const Selector: FC<SelectorProps> = ({
     <Select
       placeholder={placeholder}
       styles={{
-        // indicatorsContainer(base, props) {
-        //   return {}
-        //   return { ...base, fill: 'white' }
-        // },
         placeholder(base, props) {
-          console.log('multiValueRemove', props)
           return { ...base, color: undefined }
         },
         multiValueRemove(base, props) {
-          console.log('multiValueRemove', props)
           return {}
         },
 
         indicatorSeparator() {
           return {}
+        },
+        indicatorsContainer(base, props) {
+          return {
+            ...base,
+            // top: -25,
+            // right: 0,
+            // position: 'absolute',
+          }
         },
         control(base, props) {
           const {
@@ -66,7 +68,6 @@ export const Selector: FC<SelectorProps> = ({
           return {
             ...newBase,
             boxShadow: undefined,
-            display: 'flex',
             flexGrow: 1,
             width: '100%',
             outline: undefined,
@@ -78,25 +79,22 @@ export const Selector: FC<SelectorProps> = ({
             background: undefined,
           }
         },
-        // menuList(base, props) {
-        //   // const { ...backgroundColor, newBase } = base
-        //   return base
-        // },
+
         option(base, props) {
-          // const { ...backgroundColor, newBase } = base
           return { ...base, backgroundColor: props.isFocused ? '' : '' }
         },
         menu(base, props) {
-          // const { ...backgroundColor, newBase } = base
           return { ...base, color: 'white' }
         },
         multiValue(base, props) {
-          // removes backgroundColor
           const { backgroundColor, ...newBase } = base
           return {
             ...newBase,
             backgroundColor: matchColorToSelector(props.data.label),
           }
+        },
+        valueContainer(base, props) {
+          return { ...base, width: '100%', padding: undefined }
         },
         multiValueLabel(base, props) {
           return {
@@ -108,14 +106,15 @@ export const Selector: FC<SelectorProps> = ({
       classNames={{
         placeholder: () => 'gray-100',
         container: () => 'flex w-100',
+        multiValueRemove: () => 'max-h-10',
         multiValueLabel: () => 'font-bold',
         clearIndicator: () => 'bg-gray-700',
         dropdownIndicator: () => 'fill-white	',
-        indicatorsContainer: () => 'bg-gray-700',
-        valueContainer: () => 'bg-gray-400',
+        indicatorsContainer: () => 'flex justify-between bg-gray-700 max-h-10',
+        valueContainer: () => 'bg-gray-400 lg:p2',
         option: (state) => (state.isFocused ? 'bg-gray-800' : ''),
         control(props) {
-          const classes = ['bg-gray-800', 'border-2']
+          const classes = ['bg-gray-800', 'flex-col  sm:flex-row', 'border-2']
 
           if (props.isFocused) {
             classes.push('border-gray-800')
@@ -135,34 +134,10 @@ export const Selector: FC<SelectorProps> = ({
         trim: true,
       })}
       classNamePrefix={'selector'}
-      // formatOptionLabel={(group) => {
-      //   const color = matchColorToSelector(group.label)
-      //   return (
-      //     <div
-      //       style={{
-      //         mixBlendMode: 'difference',
-      //         filter: 'invert',
-      //         backgroundColor: color,
-      //       }}
-      //     >
-      //       {group.label}
-      //     </div>
-      //   )
-      // }}
       onChange={onChange}
       closeMenuOnSelect={false}
       options={availableOptions}
       hideSelectedOptions
-      // isOptionSelected={()}
-      isOptionDisabled={(option) => {
-        console.log('option.isSelected', option.isSelected)
-        const isSelectedOption = isSelected(option)
-        // console.log('ISDISABLE', {
-        //   label: option.label,
-        //   isDisabled: isSelectedOption,
-        // })
-        return option.isSelected
-      }}
       defaultValue={selectedOptions}
       isMulti
     />
