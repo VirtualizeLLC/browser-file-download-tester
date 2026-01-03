@@ -5,6 +5,21 @@
   "projectType": "application",
   "tags": [],
   "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "options": {
+        "webpackConfig": "apps/file-api/webpack.config.js",
+        "outputPath": "dist/apps/file-api"
+      },
+      "configurations": {
+        "production": {
+          "optimization": true
+        },
+        "development": {
+          "optimization": false
+        }
+      }
+    },
     "serve": {
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",

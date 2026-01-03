@@ -1,4 +1,4 @@
-import { FC, MouseEventHandler } from 'react'
+import { FC, MouseEventHandler, useState } from 'react'
 import { baseButtonStyle } from '../constants/styles'
 
 const fileApiBaseUrl = 'http://127.0.0.1:3333'
@@ -7,6 +7,7 @@ interface ServerFileUrlParams {
   fetchType: 'blob' | 'base64'
   fileName: string
   extensionType: string
+  query?: string
 }
 
 interface ToggleStateKeys {
@@ -23,18 +24,23 @@ const getServerFileUrl = ({
   fileName,
   fetchType,
   extensionType,
-}: ServerFileUrlParams) =>
-  `${fileApiBaseUrl}/assets/${fetchType}/${fileName}.${extensionType}`
+  query,
+}: ServerFileUrlParams) => {
+  const base = `${fileApiBaseUrl}/assets/${fetchType}/${fileName}.${extensionType}`
+  return query && query.length > 0 ? `${base}?${query}` : base
+}
 
 const fetchFile = async ({
   extensionType,
   fileName,
   verbose,
+  query,
 }: HandlerClickEvent) => {
   const url = getServerFileUrl({
     fetchType: 'blob',
     fileName,
     extensionType,
+    query,
   })
   try {
     const response = await fetch(url)
@@ -55,6 +61,7 @@ const handleLinkClick =
   ({
     fileName,
     extensionType,
+    query,
   }: HandlerClickEvent): MouseEventHandler<HTMLButtonElement> =>
   (e) => {
     e.preventDefault()
@@ -62,6 +69,7 @@ const handleLinkClick =
       fileName,
       fetchType: 'blob',
       extensionType,
+      query,
     })
     window.location.href = url
   }
@@ -96,7 +104,7 @@ const handleBlobClick =
   async (e) => {
     e.preventDefault()
     try {
-      const blobOutput = await fetchFile({ extensionType, fileName })
+      const blobOutput = await fetchFile({ extensionType, fileName, query })
       if (!blobOutput) {
         console.warn('No blob url returned')
         return
@@ -125,11 +133,13 @@ const handleBlobClick =
 const fetchFileBase64 = async ({
   fileName,
   extensionType,
+  query,
 }: Omit<ServerFileUrlParams, 'fetchType'>) => {
   const url = getServerFileUrl({
     fileName,
     fetchType: 'base64',
     extensionType,
+    query,
   })
   try {
     const response = await fetch(url)
@@ -158,7 +168,9 @@ const handleBase64Click =
       const base64Output = await fetchFileBase64({
         extensionType,
         fileName,
+        query,
       })
+      
       verbose && console.log({ base64Output })
       if (!base64Output) return
 
@@ -191,13 +203,47 @@ export const FileGetters: FC<FileGettersProps> = ({
   fileName,
   hasDownload,
 }) => {
+  const [query, setQuery] = useState<string>('')
+
+  const applyPreset = (preset: string) => setQuery(preset)
+
   return (
     <div className='flex my-2 flex-wrap gap-2 sm:justify-normal'>
+      <div className='w-full mb-2'>
+        <label className='block text-xs mb-1'>Query string tester</label>
+        <div className='flex gap-2'>
+          <input
+            className='flex-1 p-2 rounded text-sm'
+            placeholder='e.g. filename%3Dmyfile or fn="myfile"'
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <button
+            className={`${baseButtonStyle} bg-gray-600`}
+            onClick={() => applyPreset(`fn="${fileName}"`)}
+          >
+            fn="filename"
+          </button>
+          <button
+            className={`${baseButtonStyle} bg-gray-600`}
+            onClick={() => applyPreset(`filename%3D${fileName}`)}
+          >
+            filename%3D
+          </button>
+          <button
+            className={`${baseButtonStyle} bg-gray-600`}
+            onClick={() => applyPreset(`filename=${fileName}`)}
+          >
+            filename=
+          </button>
+        </div>
+      </div>
       {extensionTypes.map((extensionType: string) => {
         const anchorLink = getServerFileUrl({
           fetchType: 'blob',
           fileName,
           extensionType,
+          query,
         })
         return (
           <div key={extensionType} className='flex flex-wrap text-xs'>
@@ -226,6 +272,7 @@ export const FileGetters: FC<FileGettersProps> = ({
                   hasDownload,
                   fileName,
                   extensionType,
+                  query,
                 })}
                 className={`${baseButtonStyle} bg-blue-300`}
               >
@@ -237,6 +284,7 @@ export const FileGetters: FC<FileGettersProps> = ({
                   hasDownload,
                   fileName,
                   extensionType,
+                  query,
                 })}
                 className={`${baseButtonStyle} bg-orange-500`}
               >
@@ -249,6 +297,7 @@ export const FileGetters: FC<FileGettersProps> = ({
                   fileName,
                   extensionType,
                   setBase64Preview,
+                  query,
                 })}
                 className={`${baseButtonStyle} bg-red-400`}
               >
