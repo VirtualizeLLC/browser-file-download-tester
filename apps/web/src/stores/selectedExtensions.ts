@@ -61,7 +61,7 @@ export const useSelectedExtensionStore = create(
           }
         }
       },
-      storage: createJSONStorage(() => sessionStorage),
+      storage: createJSONStorage(() => localStorage),
     }
   )
 )

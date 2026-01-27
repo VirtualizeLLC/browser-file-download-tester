@@ -1,7 +1,45 @@
-import { FC, MouseEventHandler, useState } from 'react'
+import { FC, MouseEventHandler, useState, useEffect } from 'react'
 import { baseButtonStyle } from '../constants/styles'
 
 const fileApiBaseUrl = 'http://127.0.0.1:3333'
+
+const STORAGE_KEYS = {
+  QUERIES: 'fg_queries',
+  QUERY_SECTION: 'fg_query_expanded',
+  FILES_SECTION: 'fg_files_expanded',
+  TOP_SECTION: 'fg_top_expanded',
+}
+
+export const resetAllCache = () => {
+  Object.values(STORAGE_KEYS).forEach((key) => {
+    localStorage.removeItem(key)
+  })
+  localStorage.removeItem('app_top_section_expanded')
+  localStorage.removeItem('saved_extensions')
+}
+
+const uriEncodedCharacter = encodeURIComponent(':')
+
+const getInitialQueries = () => {
+  const fileName = `name${uriEncodedCharacter}BLAH_of-icon+override+othervalue_180LR`
+  const stored = localStorage.getItem(STORAGE_KEYS.QUERIES)
+  if (stored) {
+    try {
+      return JSON.parse(stored)
+    } catch {
+      return [
+        { name: 'fn=""', query: `fn="${fileName}"` },
+        { name: 'filename%3D', query: `filename%3D${fileName}` },
+        { name: 'filename=', query: `filename=${fileName}` },
+      ]
+    }
+  }
+  return [
+    { name: 'fn=""', query: `fn="${fileName}"` },
+    { name: 'filename%3D', query: `filename%3D${fileName}` },
+    { name: 'filename=', query: `filename=${fileName}` },
+  ]
+}
 
 interface ServerFileUrlParams {
   fetchType: 'blob' | 'base64'
@@ -100,6 +138,7 @@ const handleBlobClick =
     extensionType,
     hasRedirect,
     hasDownload,
+    query,
   }: HandlerClickEvent): MouseEventHandler<HTMLButtonElement> =>
   async (e) => {
     e.preventDefault()
@@ -158,6 +197,7 @@ const handleBase64Click =
     hasRedirect = false,
     hasDownload,
     verbose = true,
+    query,
     setBase64Preview,
   }: HandlerClickEvent & {
     setBase64Preview: (val: string) => void
@@ -192,121 +232,219 @@ const handleBase64Click =
 
 interface FileGettersProps extends ToggleStateKeys {
   extensionTypes: string[]
-  fileName: string
+  queryName: string
   setBase64Preview: (val: string) => void
 }
+
+
+const fileName = 'roadsign-test'
 
 export const FileGetters: FC<FileGettersProps> = ({
   hasRedirect,
   setBase64Preview,
   extensionTypes,
-  fileName,
   hasDownload,
 }) => {
+  const [queries, setQueries] = useState<Array<{ name: string; query: string }>>(getInitialQueries())
+  const [newName, setNewName] = useState<string>('')
+  const [newQuery, setNewQuery] = useState<string>('')
   const [query, setQuery] = useState<string>('')
+  const [isQuerySectionExpanded, setIsQuerySectionExpanded] = useState(() => {
+    const stored = localStorage.getItem(STORAGE_KEYS.QUERY_SECTION)
+    return stored ? JSON.parse(stored) : false
+  })
+  const [isFilesSectionExpanded, setIsFilesSectionExpanded] = useState(() => {
+    const stored = localStorage.getItem(STORAGE_KEYS.FILES_SECTION)
+    return stored ? JSON.parse(stored) : false
+  })
+  const [isTopSectionExpanded, setIsTopSectionExpanded] = useState(() => {
+    const stored = localStorage.getItem(STORAGE_KEYS.TOP_SECTION)
+    return stored ? JSON.parse(stored) : true
+  })
 
-  const applyPreset = (preset: string) => setQuery(preset)
+  // Persist queries to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.QUERIES, JSON.stringify(queries))
+  }, [queries])
+
+  // Persist expansion states to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.QUERY_SECTION, JSON.stringify(isQuerySectionExpanded))
+  }, [isQuerySectionExpanded])
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.FILES_SECTION, JSON.stringify(isFilesSectionExpanded))
+  }, [isFilesSectionExpanded])
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.TOP_SECTION, JSON.stringify(isTopSectionExpanded))
+  }, [isTopSectionExpanded])
+
+  const addQuery = () => {
+    if (!newName || !newQuery) return
+    setQueries((s) => [...s, { name: newName, query: newQuery }])
+    setNewName('')
+    setNewQuery('')
+  }
+
+  const removeQuery = (idx: number) => {
+    setQueries((s) => s.filter((_, i) => i !== idx))
+  }
 
   return (
-    <div className='flex my-2 flex-wrap gap-2 sm:justify-normal'>
-      <div className='w-full mb-2'>
-        <label className='block text-xs mb-1'>Query string tester</label>
-        <div className='flex gap-2'>
-          <input
-            className='flex-1 p-2 rounded text-sm'
-            placeholder='e.g. filename%3Dmyfile or fn="myfile"'
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <button
-            className={`${baseButtonStyle} bg-gray-600`}
-            onClick={() => applyPreset(`fn="${fileName}"`)}
-          >
-            fn="filename"
-          </button>
-          <button
-            className={`${baseButtonStyle} bg-gray-600`}
-            onClick={() => applyPreset(`filename%3D${fileName}`)}
-          >
-            filename%3D
-          </button>
-          <button
-            className={`${baseButtonStyle} bg-gray-600`}
-            onClick={() => applyPreset(`filename=${fileName}`)}
-          >
-            filename=
-          </button>
-        </div>
-      </div>
-      {extensionTypes.map((extensionType: string) => {
-        const anchorLink = getServerFileUrl({
-          fetchType: 'blob',
-          fileName,
-          extensionType,
-          query,
-        })
-        return (
-          <div key={extensionType} className='flex flex-wrap text-xs'>
-            <div className='flex flex-col bg-gray-700 p-4 rounded flex-wrap'>
-              <h2 className='underline py-2'>
-                {fileName}.{extensionType}
-              </h2>
-              <span className={`${baseButtonStyle} bg-blue-500`}>
-                <a href={anchorLink}>
-                  <span>anchor link</span>
-                </a>
-              </span>
-              <span className={`${baseButtonStyle} bg-blue-300`}>
-                <a
-                  href={anchorLink}
-                  target='_blank'
-                  rel='noreferrer'
-                  download={true}
-                >
-                  <span>anchor redirect</span>
-                </a>
-              </span>
+    <div className='flex my-2 flex-wrap gap-3 sm:gap-2 w-full'>
+      <div className='w-full mb-3'>
+        <button
+          onClick={() => setIsQuerySectionExpanded(!isQuerySectionExpanded)}
+          className='flex items-center gap-2 w-full mb-2 text-sm font-semibold text-white hover:text-gray-200'
+        >
+          <span>{isQuerySectionExpanded ? '▼' : '▶'}</span>
+          <span>Query presets</span>
+        </button>
+
+        {isQuerySectionExpanded && (
+          <>
+            <div className='flex flex-col sm:flex-row gap-2 mb-3 p-2 bg-gray-800 rounded'>
+              <input
+                className='flex-1 p-2 rounded text-sm text-white bg-gray-700 placeholder-gray-400 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 min-w-0'
+                placeholder='name (shorthand)'
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+              />
+              <input
+                className='flex-1 p-2 rounded text-sm text-white bg-gray-700 placeholder-gray-400 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 min-w-0'
+                placeholder='query string'
+                value={newQuery}
+                onChange={(e) => setNewQuery(e.target.value)}
+              />
               <button
-                onClick={handleLinkClick({
-                  hasRedirect,
-                  hasDownload,
-                  fileName,
-                  extensionType,
-                  query,
-                })}
-                className={`${baseButtonStyle} bg-blue-300`}
+                className={`${baseButtonStyle} bg-green-500 shrink-0`}
+                onClick={addQuery}
               >
-                <div>button redirect</div>
-              </button>
-              <button
-                onClick={handleBlobClick({
-                  hasRedirect,
-                  hasDownload,
-                  fileName,
-                  extensionType,
-                  query,
-                })}
-                className={`${baseButtonStyle} bg-orange-500`}
-              >
-                <div>blob</div>
-              </button>
-              <button
-                onClick={handleBase64Click({
-                  hasRedirect,
-                  hasDownload,
-                  fileName,
-                  extensionType,
-                  setBase64Preview,
-                  query,
-                })}
-                className={`${baseButtonStyle} bg-red-400`}
-              >
-                <div>base64</div>
+                Add
               </button>
             </div>
+
+            <div className='flex gap-2 flex-wrap p-2 bg-gray-800 rounded'>
+              {queries.map((q, idx) => (
+                <div
+                  key={`${q.name}-${idx}`}
+                  className='flex items-center gap-2 bg-gray-700 px-2 py-1 rounded text-xs'
+                >
+                  <span className='text-white font-medium'>{q.name}</span>
+                  <span className='text-gray-300 truncate'>{q.query}</span>
+                  <button
+                    className='text-red-300 ml-1 hover:text-red-400'
+                    onClick={() => removeQuery(idx)}
+                    aria-label={`remove ${q.name}`}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+      <div className='w-full'>
+        <button
+          onClick={() => setIsFilesSectionExpanded(!isFilesSectionExpanded)}
+          className='flex items-center gap-2 w-full mb-3 text-sm font-semibold text-white hover:text-gray-200'
+        >
+          <span>{isFilesSectionExpanded ? '▼' : '▶'}</span>
+          <span>File Downloads</span>
+        </button>
+
+        {isFilesSectionExpanded && (
+          <div className='flex flex-wrap gap-3 sm:gap-2'>
+            {extensionTypes.map((extensionType: string) => {
+              const anchorLink = getServerFileUrl({
+                fetchType: 'blob',
+                fileName: fileName,
+                extensionType,
+                query,
+              })
+              return (
+                <div key={extensionType} className='w-full sm:w-auto'>
+                  <div className='flex flex-col bg-gray-700 p-3 rounded text-xs'>
+                    <h2 className='underline py-2 font-semibold'>
+                      {fileName}.{extensionType}
+                    </h2>
+                    <span className={`${baseButtonStyle} bg-blue-500 text-sm`}>
+                      <a href={anchorLink}>
+                        <span>anchor link</span>
+                      </a>
+                    </span>
+                    <span className={`${baseButtonStyle} bg-blue-300 text-sm`}>
+                      <a
+                        href={anchorLink}
+                        target='_blank'
+                        rel='noreferrer'
+                        download={true}
+                      >
+                        <span>anchor redirect</span>
+                      </a>
+                    </span>
+                    <button
+                      onClick={handleLinkClick({
+                        hasRedirect,
+                        hasDownload,
+                        fileName,
+                        extensionType,
+                        query,
+                      })}
+                      className={`${baseButtonStyle} bg-blue-300 text-sm`}
+                    >
+                      <div>button redirect</div>
+                    </button>
+                    <button
+                      onClick={handleBlobClick({
+                        hasRedirect,
+                        hasDownload,
+                        fileName,
+                        extensionType,
+                        query,
+                      })}
+                      className={`${baseButtonStyle} bg-orange-500 text-sm`}
+                    >
+                      <div>blob</div>
+                    </button>
+                    <button
+                      onClick={handleBase64Click({
+                        hasRedirect,
+                        hasDownload,
+                        fileName,
+                        extensionType,
+                        setBase64Preview,
+                        query,
+                      })}
+                      className={`${baseButtonStyle} bg-red-400 text-sm`}
+                    >
+                      <div>base64</div>
+                    </button>
+                    <div className='flex gap-2 flex-wrap mt-3'>
+                      {queries.map((q, i) => (
+                        <a
+                          key={`${q.name}-${i}`}
+                          className={`${baseButtonStyle} bg-green-500 text-xs sm:text-sm`}
+                          href={getServerFileUrl({
+                            fetchType: 'blob',
+                            fileName,
+                            extensionType,
+                            query: q.query,
+                          })}
+                        >
+                          <span>{q.name}</span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
           </div>
-        )
-      })}
+        )}
+      </div>
     </div>
   )
 }
