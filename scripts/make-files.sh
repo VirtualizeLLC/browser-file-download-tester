@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 FOLDER=apps/file-api/src/assets
 
 extensions=( png webp jpg jpeg mp4 mp3 wav mkv json json5 md txt xml)
@@ -37,16 +39,16 @@ do
 done
 
 # Ensure we have a jpg roadsign test asset (some tooling expects .jpg)
-if [ ! -f "$FOLDER/roadsign-test.jpg" ]; then
-  if [ -f "$FOLDER/roadsign-test.png" ]; then
+if [ ! -f "$FOLDER/scuba-test-image.jpeg" ]; then
+  if [ -f "$FOLDER/scuba-test-image.png" ]; then
     # macOS has sips; ImageMagick has convert
     if command -v sips >/dev/null 2>&1; then
-      sips -s format jpeg "$FOLDER/roadsign-test.png" --out "$FOLDER/roadsign-test.jpg" >/dev/null 2>&1 || true
+      sips -s format jpeg "$FOLDER/scuba-test-image.png" --out "$FOLDER/scuba-test-image.jpeg" >/dev/null 2>&1 || true
     elif command -v convert >/dev/null 2>&1; then
-      convert "$FOLDER/roadsign-test.png" "$FOLDER/roadsign-test.jpg" >/dev/null 2>&1 || true
+      convert "$FOLDER/scuba-test-image.png" "$FOLDER/scuba-test-image.jpg" >/dev/null 2>&1 || true
     else
       # As a last resort, copy the png to .jpg (not a true jpeg but works for presence)
-      cp "$FOLDER/roadsign-test.png" "$FOLDER/roadsign-test.jpg" || true
+      cp "$FOLDER/scuba-test-image.png" "$FOLDER/scuba-test-image.jpg" || true
     fi
   fi
 fi

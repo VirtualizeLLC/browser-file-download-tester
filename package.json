@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "setup": "yarn run generate-assets",
-    "generate-assets": "./scripts/make-files.sh",
+    "generate-assets": "bash ./scripts/make-files.sh",
     "serve": "nx run-many --target=serve --parallel",
     "serve:web": "nx serve web",
     "serve:api": "nx serve file-api",

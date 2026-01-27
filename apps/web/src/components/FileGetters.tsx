@@ -237,7 +237,7 @@ interface FileGettersProps extends ToggleStateKeys {
 }
 
 
-const fileName = 'roadsign-test'
+const fileName = 'scuba-test-image'
 
 export const FileGetters: FC<FileGettersProps> = ({
   hasRedirect,
